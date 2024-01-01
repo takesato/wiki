@@ -1,0 +1,50 @@
+site_name: wiki
+
+theme:
+  name: 'material'
+  language: 'ja'
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.instant
+    - navigation.tracking
+    - navigation.top
+    - content.tabs.link
+repo_url: https://github.com/takesato/wiki
+edit_uri: edit/main/docs
+use_directory_urls: false
+
+extra:
+  search:
+    language: 'jp'
+
+markdown_extensions:
+  - admonition
+  - footnotes
+  - tables
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.highlight:
+      linenums: true
+  - toc:
+      permalink: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.magiclink
+
+plugins:
+  - awesome-pages
+  - tags:
+      tags_file: tags.md
+  - section-index
+  - pagenav-generator
+  - search:
+      lang:
+        - ja
+        - en

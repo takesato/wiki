@@ -1,0 +1,59 @@
+name: Deploy MkDocs Wiki
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+      - uses: actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - name: build mkdocs
+        shell: bash
+        run: |
+          pip install mkdocs-material
+          pip install git+https://github.com/jldiaz/mkdocs-plugin-tags.git#egg=tags-macros-plugin
+          pip install mkdocs-awesome-pages-plugin
+          pip install mkdocs-section-index
+          pip install git+https://github.com/Andre601/mkdocs-pagenav-generator
+          mkdocs build
+          ls -al
+          ls -al site
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: ./site
+
+  # Deployment job
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
